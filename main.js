@@ -1,16 +1,22 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('path');
 
 let win;
 
 function createWindow() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width } = primaryDisplay.workAreaSize;
+
   win = new BrowserWindow({
     width: 350,
     height: 425,
+    x: width - 360, // position near top-right corner
+    y: 10,
     resizable: false,
-    frame: false,                // Frameless window (no OS border)
-    transparent: true,           // Allow transparent background
-    alwaysOnTop: false,           // Optional: keep widget above other windows
+    frame: false,
+    transparent: true,
+    alwaysOnTop: false,
+    skipTaskbar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -19,19 +25,15 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
-
-  // Optional: Remove default menu bar
   win.setMenuBarVisibility(false);
 }
 
-// Handle custom close command from renderer
 ipcMain.on('close-window', () => {
   if (win) win.close();
 });
 
 app.whenReady().then(() => {
   createWindow();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
