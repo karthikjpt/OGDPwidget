@@ -6,8 +6,8 @@ function createWindow() {
   win = new BrowserWindow({
     width: 350,
     height: 425,
-    frame: false,            // frameless for widget style
-    transparent: true,       // transparent background
+    frame: false,            // frameless window for custom controls
+    transparent: true,
     webPreferences: {
       preload: __dirname + '/preload.js',
       nodeIntegration: false,
