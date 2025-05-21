@@ -10,27 +10,38 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "in.ogdp.todayeq",
     "productName": "OGDP",
     "files": [
-      "**/*"
+      "**/*",
+      "!**/node_modules/{.cache,electron-builder}/*"
     ],
+    "directories": {
+      "output": "dist"
+    },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
       "maintainer": "Karthik <karthikmi@hotmail.com>",
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "build/icon.png"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.ico"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "build/icon.icns"
+    },
+    "publish": {
+      "provider": "github"
     }
   },
   "devDependencies": {
