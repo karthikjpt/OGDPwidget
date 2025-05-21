@@ -1,3 +1,5 @@
-node_modules/
+# Electron Builder
 dist/
+build/icons/
 *.log
+.DS_Store
