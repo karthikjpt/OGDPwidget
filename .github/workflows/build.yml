@@ -1,8 +1,8 @@
-name: Build Electron App
+name: Build and Release OGDP Electron App
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -17,23 +17,46 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Install System Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils libatspi2.0-0 libuuid1 libappindicator3-1 libsecret-1-0
+          sudo apt-get install -y imagemagick
+
+      - name: Generate App Icons
+        run: |
+          npm install sharp to-ico --save-dev
+          npm run generate-icons
+
+      - name: Install Project Dependencies
         run: |
           npm install
           npm run postinstall
 
-      - name: Build with Electron Builder
+      - name: Build Electron App
         run: npm run dist
-        
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ runner.os }}
+          name: OGDP-${{ runner.os }}-${{ github.sha }}
           path: dist/
-          retention-days: 5
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload Build Logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ runner.os }}
+          path: |
+            *.log
+            npm-debug.log*
+          retention-days: 3
