@@ -1,0 +1,40 @@
+{
+  "name": "OGDP",
+  "version": "1.0.0",
+  "description": "OGDP Earthquake Widget",
+  "author": {
+    "name": "Karthik",
+    "email": "karthikmi@hotmail.com"
+  },
+  "homepage": "https://www.ogdp.in",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "in.ogdp.todayeq",
+    "productName": "OGDP",
+    "files": [
+      "**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "maintainer": "Karthik <karthikmi@hotmail.com>",
+      "category": "Utility"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
