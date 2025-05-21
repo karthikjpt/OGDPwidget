@@ -59,5 +59,10 @@
     <!-- The rest of your widget content loads here -->
   </div>
   <script src="https://www.ogdp.in/todayeq.js"></script>
+<script>
+  document.getElementById('close-btn').addEventListener('click', () => {
+    window.electronAPI.closeWindow();
+  });
+</script>
 </body>
 </html>
