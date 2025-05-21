@@ -4,6 +4,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   sendMessage: (msg) => ipcRenderer.send('message', msg),
   onMessage: (callback) => ipcRenderer.on('reply', (event, data) => callback(data)),
 
-  // Add closeWindow method
+  // Close button support
   closeWindow: () => ipcRenderer.send('close-window')
 });
