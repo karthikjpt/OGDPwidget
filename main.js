@@ -1,30 +1,29 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+
+let win;
 
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 350,
     height: 425,
-    frame: false,           // Frameless window for clean widget look
-    transparent: true,      // Transparent background, so widget UI can blend with desktop
-    alwaysOnTop: true,      // Keep widget visible above other windows
-    resizable: false,       // Prevent resizing
-    skipTaskbar: true,      // Hide from taskbar for widget feel
+    frame: false,            // frameless for widget style
+    transparent: true,       // transparent background
     webPreferences: {
+      preload: __dirname + '/preload.js',
       nodeIntegration: false,
-      contextIsolation: true,
-      preload: __dirname + '/preload.js'  // (Optional) preload script for safe node API exposure
+      contextIsolation: true
     }
   });
 
   win.loadFile('index.html');
-
-  // Remove the menu bar completely
-  win.setMenu(null);
 }
 
 app.whenReady().then(createWindow);
 
+ipcMain.on('close-window', () => {
+  if (win) win.close();
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-
