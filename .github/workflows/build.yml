@@ -1,9 +1,13 @@
-name: Build and Release OGDP Electron App
+name: Build and Release OGDP
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
+env:
+  CI: true
+  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
   build:
@@ -11,11 +15,20 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            icon-cmd: sudo apt-get install -y imagemagick
+          - os: windows-latest
+            icon-cmd: choco install imagemagick -y
+          - os: macos-latest
+            icon-cmd: brew install imagemagick
       fail-fast: false
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,40 +36,40 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: Install System Dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils libatspi2.0-0 libuuid1 libappindicator3-1 libsecret-1-0
-          sudo apt-get install -y imagemagick
+      - name: Install System Dependencies
+        run: ${{ matrix.icon-cmd }}
 
-      - name: Generate App Icons
+      - name: Generate Dynamic Icons
         run: |
-          npm install sharp to-ico --save-dev
-          npm run generate-icons
+          npm install sharp to-ico --no-save
+          node scripts/generate-icons.js
 
       - name: Install Project Dependencies
         run: |
-          npm install
+          npm ci
           npm run postinstall
 
       - name: Build Electron App
         run: npm run dist
+        env:
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OGDP-${{ runner.os }}-${{ github.sha }}
-          path: dist/
+          name: OGDP-${{ runner.os }}-v${{ github.run_number }}
+          path: |
+            dist/*
+            !dist/**/*.blockmap
           retention-days: 7
-          if-no-files-found: error
+          compression-level: 9
 
-      - name: Upload Build Logs
-        if: ${{ always() }}
+      - name: Upload Build Metadata
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs-${{ runner.os }}
+          name: build-meta-${{ runner.os }}
           path: |
-            *.log
-            npm-debug.log*
-          retention-days: 3
+            build/logs/
+            dist/*.yml
+            dist/*.json
+          retention-days: 30
