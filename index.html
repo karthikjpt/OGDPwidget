@@ -25,6 +25,12 @@
       padding: 10px;
       font-family: Arial, sans-serif;
     }
+
+    /* Make interactive elements inside widget clickable */
+    button, a, input, select, textarea {
+      -webkit-app-region: no-drag;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -32,4 +38,3 @@
   <script src="https://www.ogdp.in/todayeq.js"></script>
 </body>
 </html>
-
