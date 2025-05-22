@@ -39,11 +39,6 @@ jobs:
       - name: Install System Dependencies
         run: ${{ matrix.icon-cmd }}
 
-      - name: Generate Dynamic Icons
-        run: |
-          npm install sharp to-ico --no-save
-          node scripts/generate-icons.js
-
       - name: Install Project Dependencies
         run: |
           npm ci
