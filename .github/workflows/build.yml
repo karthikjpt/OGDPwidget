@@ -8,6 +8,7 @@ on:
 env:
   CI: true
   NODE_OPTIONS: --max_old_space_size=4096
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Add this line to make token available
 
 jobs:
   build:
@@ -48,6 +49,8 @@ jobs:
         run: npm run build
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
+          # Additional env vars for macOS code signing (optional)
+          CSC_IDENTITY_AUTO_DISCOVERY: false  # Disable if you're not code signing
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
