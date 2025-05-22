@@ -1,6 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge } = require('electron');
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  closeWindow: () => ipcRenderer.send('close-window')
-});
+contextBridge.exposeInMainWorld('electronAPI', {});
 
