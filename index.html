@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>OGDP</title>
   <style>
     html, body {
@@ -10,38 +10,46 @@
       width: 100%;
       height: 100%;
       background: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       -webkit-user-select: none;
       overflow: hidden;
     }
 
     #todayeq-widget {
-      width: 350px;
-      height: 400px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
+      width: 100%; /* Now fills the entire window width */
+      height: 100%;
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2); /* Shadow on left side only */
       background: rgba(0, 0, 0, 0.85);
       color: white;
       padding: 10px;
       font-family: Arial, sans-serif;
-      overflow: auto;
-      position: relative;
+      overflow-y: auto;
+      box-sizing: border-box;
     }
 
-    /* Make interactive elements look good */
-    button, a, input, select, textarea {
-      cursor: pointer;
+    /* Optional right-edge styling */
+    #todayeq-widget::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Scrollbar styling */
+    #todayeq-widget::-webkit-scrollbar {
+      width: 6px;
+    }
+    #todayeq-widget::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
     }
   </style>
 </head>
 <body>
   <div id="todayeq-widget">
-    <!-- Widget content loads here -->
+    <!-- Your widget content -->
   </div>
-
   <script src="https://www.ogdp.in/todayeq.js"></script>
 </body>
 </html>
-

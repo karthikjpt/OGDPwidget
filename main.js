@@ -5,13 +5,14 @@ let win;
 
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
-  const { width } = primaryDisplay.workAreaSize;
+  const { width, height } = primaryDisplay.workAreaSize;
+  const widgetWidth = 400;
 
   win = new BrowserWindow({
-    width: 350,
-    height: 400,
-    x: width - 360,
-    y: 10,
+    width: widgetWidth,
+    height: height,
+    x: width - widgetWidth, // Exact right edge positioning
+    y: 0,
     resizable: false,
     frame: false,
     transparent: true,
@@ -43,4 +44,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-
