@@ -26,6 +26,14 @@
       "output": "dist",
       "buildResources": "build"
     },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "OGDP Earthquake"
+    },
     "linux": {
       "target": [
         "AppImage",
@@ -42,15 +50,7 @@
       ],
       "icon": "build/icons/icon.ico",
       "publisherName": "Karthik",
-      "artifactName": "${productName}-Setup-${version}.${ext}",
-      "nsis": {
-        "oneClick": false,
-        "perMachine": true,
-        "allowToChangeInstallationDirectory": true,
-        "createDesktopShortcut": true,
-        "createStartMenuShortcut": true,
-        "shortcutName": "OGDP Earthquake"
-      }
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "mac": {
       "target": [
@@ -71,4 +71,3 @@
     "sharp": "^0.33.2"
   }
 }
-
