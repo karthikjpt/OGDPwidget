@@ -9,8 +9,8 @@ function createWindow() {
 
   win = new BrowserWindow({
     width: 350,
-    height: 425,
-    x: width - 360, // position near top-right corner
+    height: 400,
+    x: width - 360,
     y: 10,
     resizable: false,
     frame: false,
@@ -34,6 +34,7 @@ ipcMain.on('close-window', () => {
 
 app.whenReady().then(() => {
   createWindow();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
@@ -42,3 +43,4 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
