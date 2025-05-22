@@ -8,9 +8,16 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
   const widgetWidth = 400;
 
-  const iconPath = process.platform === 'win32'
-    ? path.join(__dirname, 'build', 'icons', 'icon.ico')
-    : path.join(__dirname, 'build', 'icons', 'icon.png');
+  // Platform-specific icon path
+  let iconPath;
+  if (process.platform === 'win32') {
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.ico');
+  } else if (process.platform === 'linux') {
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
+  } else if (process.platform === 'darwin') {
+    // Optional for development (macOS uses .icns at packaging time)
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
+  }
 
   win = new BrowserWindow({
     width: widgetWidth,
@@ -21,8 +28,8 @@ function createWindow() {
     frame: false,
     transparent: true,
     alwaysOnTop: false,
-    skipTaskbar: false, // show in taskbar
-    icon: iconPath, // <--- ADD THIS
+    skipTaskbar: false,
+    icon: iconPath, // Works in Windows & Linux; macOS uses .icns when packaged
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
