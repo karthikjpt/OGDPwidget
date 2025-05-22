@@ -10,7 +10,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder",
+    "build": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
@@ -19,8 +19,7 @@
     "copyright": "Copyright © 2025 OGDP",
     "files": [
       "**/*",
-      "!**/node_modules/{.cache,electron-builder}/*",
-      "!build/icon-generator.js"
+      "!**/node_modules/{.cache,electron-builder}/*"
     ],
     "directories": {
       "output": "dist",
@@ -60,4 +59,3 @@
     "sharp": "^0.33.2"
   }
 }
-
