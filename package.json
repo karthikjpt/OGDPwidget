@@ -1,6 +1,6 @@
 {
   "name": "OGDP",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OGDP Earthquake Widget",
   "author": {
     "name": "Karthik",
@@ -19,7 +19,8 @@
     "copyright": "Copyright © 2025 OGDP",
     "files": [
       "**/*",
-      "!**/node_modules/{.cache,electron-builder}/*"
+      "!**/node_modules/.cache/*",
+      "!**/node_modules/electron-builder/*"
     ],
     "directories": {
       "output": "dist",
@@ -39,7 +40,17 @@
         "nsis",
         "portable"
       ],
-      "icon": "build/icons/icon.ico"
+      "icon": "build/icons/icon.ico",
+      "publisherName": "Karthik",
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "nsis": {
+        "oneClick": false,
+        "perMachine": true,
+        "allowToChangeInstallationDirectory": true,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true,
+        "shortcutName": "OGDP Earthquake"
+      }
     },
     "mac": {
       "target": [
@@ -53,9 +64,11 @@
       "provider": "github"
     }
   },
+  "dependencies": {},
   "devDependencies": {
-    "electron": "^29.4.6",
+    "electron": "29.4.6",
     "electron-builder": "^24.13.3",
     "sharp": "^0.33.2"
   }
 }
+

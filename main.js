@@ -3,6 +3,9 @@ const path = require('path');
 
 let win;
 
+// Optional: Fix graphics-related crashes (especially on Linux/VMs)
+app.commandLine.appendSwitch('disable-gpu');
+
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
@@ -27,9 +30,10 @@ function createWindow() {
     resizable: false,
     frame: false,
     transparent: true,
+    backgroundColor: '#00000000', // Needed for some Linux/macOS setups
     alwaysOnTop: false,
     skipTaskbar: false,
-    icon: iconPath, // Works in Windows & Linux; macOS uses .icns when packaged
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -37,14 +41,24 @@ function createWindow() {
     }
   });
 
-  win.loadFile('index.html');
   win.setMenuBarVisibility(false);
+
+  win.loadFile('index.html').catch(err => {
+    console.error('Failed to load index.html:', err);
+  });
+
+  // Clean up reference on close
+  win.on('closed', () => {
+    win = null;
+  });
 }
 
+// Handle renderer close request
 ipcMain.on('close-window', () => {
   if (win) win.close();
 });
 
+// App ready
 app.whenReady().then(() => {
   createWindow();
 
@@ -53,6 +67,10 @@ app.whenReady().then(() => {
   });
 });
 
+// Quit unless on macOS
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
+

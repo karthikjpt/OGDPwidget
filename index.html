@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>OGDP</title>
   <style>
     html, body {
@@ -15,9 +15,10 @@
     }
 
     #todayeq-widget {
-      width: 100%; /* Now fills the entire window width */
+      position: relative; /* Added for ::after positioning */
+      width: 100%; /* fills entire window width */
       height: 100%;
-      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2); /* Shadow on left side only */
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2); /* Shadow on left side */
       background: rgba(0, 0, 0, 0.85);
       color: white;
       padding: 10px;
@@ -26,7 +27,7 @@
       box-sizing: border-box;
     }
 
-    /* Optional right-edge styling */
+    /* Left edge thin line */
     #todayeq-widget::after {
       content: '';
       position: absolute;
@@ -53,3 +54,4 @@
   <script src="https://www.ogdp.in/todayeq.js"></script>
 </body>
 </html>
+
