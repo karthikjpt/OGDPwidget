@@ -45,7 +45,7 @@ jobs:
           npm run postinstall
 
       - name: Build Electron App
-        run: npm run dist
+        run: npm run build
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
