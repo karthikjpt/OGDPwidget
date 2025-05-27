@@ -30,15 +30,21 @@ function createWindow() {
     resizable: false,
     frame: false,
     transparent: true,
-    backgroundColor: '#00000000', // Needed for some Linux/macOS setups
+    backgroundColor: '#00000000',
     alwaysOnTop: false,
     skipTaskbar: false,
     icon: iconPath,
+    fullscreenable: false, // ❗️Prevents fullscreen via F11 or green button
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
+  });
+  
+  // Prevent forced programmatic fullscreen (safety net)
+  win.on('enter-full-screen', () => {
+    win.setFullScreen(false);
   });
 
   win.setMenuBarVisibility(false);
