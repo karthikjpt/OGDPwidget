@@ -1,7 +1,7 @@
 {
   "name": "OGDP",
   "version": "1.0.1",
-  "description": "OGDP Earthquake Widget",
+  "description": "OGDP",
   "author": {
     "name": "Karthik",
     "email": "karthikmi@hotmail.com"
@@ -15,7 +15,7 @@
   },
   "build": {
     "appId": "in.ogdp.todayeq",
-    "productName": "OGDP Earthquake Widget",
+    "productName": "OGDP",
     "copyright": "Copyright © 2025 OGDP",
     "files": [
       "**/*",
