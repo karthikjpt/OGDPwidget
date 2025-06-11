@@ -1,24 +1,9 @@
 const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('path');
-const fs = require('fs');
-
-const PREF_PATH = path.join(app.getPath('userData'), 'user-preferences.json');
-
-function loadPreferences() {
-  try {
-    return JSON.parse(fs.readFileSync(PREF_PATH));
-  } catch {
-    return { startup: false };
-  }
-}
-
-function savePreferences(prefs) {
-  fs.writeFileSync(PREF_PATH, JSON.stringify(prefs, null, 2));
-}
 
 let win;
 
-// Optional: Fix graphics-related crashes
+// Optional: Fix graphics-related crashes (especially on Linux/VMs)
 app.commandLine.appendSwitch('disable-gpu');
 
 function createWindow() {
@@ -26,10 +11,14 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
   const widgetWidth = 400;
 
+  // Platform-specific icon path
   let iconPath;
   if (process.platform === 'win32') {
     iconPath = path.join(__dirname, 'build', 'icons', 'icon.ico');
-  } else {
+  } else if (process.platform === 'linux') {
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
+  } else if (process.platform === 'darwin') {
+    // Optional for development (macOS uses .icns at packaging time)
     iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
   }
 
@@ -45,14 +34,15 @@ function createWindow() {
     alwaysOnTop: false,
     skipTaskbar: false,
     icon: iconPath,
-    fullscreenable: false,
+    fullscreenable: false, // ❗️Prevents fullscreen via F11 or green button
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
   });
-
+  
+  // Prevent forced programmatic fullscreen (safety net)
   win.on('enter-full-screen', () => {
     win.setFullScreen(false);
   });
@@ -63,44 +53,27 @@ function createWindow() {
     console.error('Failed to load index.html:', err);
   });
 
+  // Clean up reference on close
   win.on('closed', () => {
     win = null;
   });
 }
 
-// Handle renderer events
+// Handle renderer close request
 ipcMain.on('close-window', () => {
   if (win) win.close();
-});
-
-ipcMain.on('get-startup-preference', (event) => {
-  event.reply('startup-preference', loadPreferences().startup || false);
-});
-
-ipcMain.on('set-startup-preference', (event, enabled) => {
-  const updated = { ...loadPreferences(), startup: enabled };
-  savePreferences(updated);
-  app.setLoginItemSettings({
-    openAtLogin: enabled
-  });
 });
 
 // App ready
 app.whenReady().then(() => {
   createWindow();
 
-  // Restore saved startup preference
-  const prefs = loadPreferences();
-  app.setLoginItemSettings({
-    openAtLogin: prefs.startup || false
-  });
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// Quit on all windows closed (except macOS)
+// Quit unless on macOS
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
