@@ -1,7 +1,7 @@
 {
   "name": "OGDP",
   "version": "1.0.1",
-  "description": "OGDP",
+  "description": "OGDP Earthquake Widget",
   "author": {
     "name": "Karthik",
     "email": "karthikmi@hotmail.com"
@@ -10,6 +10,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
     "build": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -20,7 +21,9 @@
     "files": [
       "**/*",
       "!**/node_modules/.cache/*",
-      "!**/node_modules/electron-builder/*"
+      "!**/node_modules/electron-builder/*",
+      "!**/*.log",
+      "!**/.vscode/**"
     ],
     "directories": {
       "output": "dist",
@@ -35,28 +38,19 @@
       "shortcutName": "OGDP Earthquake"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
+      "target": ["AppImage", "deb"],
       "maintainer": "Karthik <karthikmi@hotmail.com>",
       "category": "Utility",
       "icon": "build/icons/icon.png"
     },
     "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
+      "target": ["nsis", "portable"],
       "icon": "build/icons/icon.ico",
       "publisherName": "Karthik",
       "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
+      "target": ["dmg", "zip"],
       "category": "public.app-category.utilities",
       "icon": "build/icons/icon.icns"
     },
@@ -64,10 +58,10 @@
       "provider": "github"
     }
   },
-  "dependencies": {},
   "devDependencies": {
-    "electron": "29.4.6",
+    "electron": "^29.4.6",
     "electron-builder": "^24.13.3",
-    "sharp": "^0.33.2"
+    "sharp": "^0.33.2",
+    "electron-reload": "^2.0.0"
   }
 }
