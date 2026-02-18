@@ -41,7 +41,8 @@
       "target": ["AppImage", "deb"],
       "maintainer": "Karthik <karthikmi@hotmail.com>",
       "category": "Utility",
-      "icon": "build/icons/icon.png"
+      "icon": "build/icons/icon.png",
+      "desktop": "build/OGDP.desktop"
     },
     "win": {
       "target": ["nsis", "portable"],
