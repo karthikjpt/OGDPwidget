@@ -61,7 +61,6 @@
   "devDependencies": {
     "electron": "^29.4.6",
     "electron-builder": "^24.13.3",
-    "sharp": "^0.33.2",
-    "electron-reload": "^2.0.0"
+    "sharp": "^0.33.2"
   }
 }
