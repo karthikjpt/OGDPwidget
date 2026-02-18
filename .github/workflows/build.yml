@@ -9,7 +9,7 @@ env:
   CI: true
   NODE_OPTIONS: --max_old_space_size=4096
   GH_TOKEN: ${{ github.token }}
-  
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -45,12 +45,24 @@ jobs:
           npm ci
           npm run postinstall
 
+      - name: Cache Electron Builder
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/electron-builder
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('package-lock.json') }}
+
       - name: Build Electron App
         run: npm run build
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
-          # Additional env vars for macOS code signing (optional)
-          CSC_IDENTITY_AUTO_DISCOVERY: false  # Disable if you're not code signing
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Prepare Linux Desktop Entry (for AppImage taskbar icon)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p dist/linux-unpacked/share/applications
+          cp build/OGDP.desktop dist/linux-unpacked/share/applications/
+        # Ensure the .desktop file has proper StartupWMClass matching Electron's window class
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -71,3 +83,10 @@ jobs:
             dist/*.yml
             dist/*.json
           retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
