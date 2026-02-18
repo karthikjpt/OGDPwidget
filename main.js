@@ -31,13 +31,13 @@ function createWindow() {
     x: width - widgetWidth,
     y: 0,
     resizable: false,
-    frame: isLinux,          
+    frame: isLinux,          // Keep frame for Linux taskbar
     transparent: !isLinux,   
     backgroundColor: '#00000000',
     alwaysOnTop: true,
-    skipTaskbar: false,     // <-- show in taskbar
-    icon: iconPath,
-    title: 'OGDP Earthquake',
+    skipTaskbar: false,      // Show in taskbar
+    icon: iconPath,          // Taskbar icon
+    title: 'OGDP',           // Match StartupWMClass
     minimizable: true,
     closable: true,
     fullscreenable: false,
