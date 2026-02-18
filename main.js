@@ -25,18 +25,17 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
   const widgetWidth = 400;
 
-  // Create BrowserWindow
   win = new BrowserWindow({
     width: widgetWidth,
     height: height,
     x: width - widgetWidth,
     y: 0,
     resizable: false,
-    frame: isLinux,            // Use frame on Linux for better compatibility
-    transparent: !isLinux,     // Transparent for Windows/macOS
+    frame: isLinux,          
+    transparent: !isLinux,   
     backgroundColor: '#00000000',
-    alwaysOnTop: true,         // Widget stays on top
-    skipTaskbar: true,         // Hide from taskbar
+    alwaysOnTop: true,
+    skipTaskbar: false,     // <-- show in taskbar
     icon: iconPath,
     title: 'OGDP Earthquake',
     minimizable: true,
