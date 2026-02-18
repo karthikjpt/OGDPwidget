@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=OGDP
+Comment=OGDP Earthquake Widget
+Exec=/path/to/OGDP-1.0.1.AppImage
+Icon=/path/to/build/icons/icon.png
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupWMClass=OGDP
