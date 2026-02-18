@@ -75,14 +75,28 @@ app.whenReady().then(() => {
 
   tray = new Tray(iconPath);
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show Widget', click: () => { if (!win) createWindow(); else win.show(); } },
-    { label: 'Exit', click: () => { app.quit(); } }
+    { label: 'Show Widget', click: () => win.show() },
+    { label: 'Exit', click: () => { app.isQuitting = true; app.quit(); } }
   ]);
   tray.setToolTip('OGDP Earthquake Widget');
   tray.setContextMenu(contextMenu);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+
+  // Hide window instead of quitting
+  win.on('close', (e) => {
+    if (!app.isQuitting) {
+      e.preventDefault();
+      win.hide();
+    }
+  });
+
+  // Optional: minimize to tray
+  win.on('minimize', (e) => {
+    e.preventDefault();
+    win.hide();
   });
 });
 
