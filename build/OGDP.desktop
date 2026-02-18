@@ -1,8 +1,9 @@
 [Desktop Entry]
+Version=1.0
 Name=OGDP
 Comment=OGDP Earthquake Widget
-Exec=/path/to/OGDP-1.0.1.AppImage
-Icon=/path/to/build/icons/icon.png
+Exec=OGDP-1.0.1.AppImage
+Icon=/absolute/path/to/build/icons/icon.png
 Terminal=false
 Type=Application
 Categories=Utility;
