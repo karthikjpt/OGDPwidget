@@ -1,81 +1,97 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 
-let win;
+// Detect platform
+const platform = process.platform;
+const isLinux = platform === 'linux';
 
-// Optional: Fix graphics-related crashes (especially on Linux/VMs)
+// Global reference
+let win;
+let tray;
+
+// Optional: Fix graphics-related crashes on Linux/VMs
 app.commandLine.appendSwitch('disable-gpu');
+
+// Platform-specific icon paths
+const icons = {
+  win32: path.join(__dirname, 'build', 'icons', 'icon.ico'),
+  linux: path.join(__dirname, 'build', 'icons', 'icon.png'),
+  darwin: path.join(__dirname, 'build', 'icons', 'icon.png')
+};
+const iconPath = icons[platform] || icons.linux;
 
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
   const widgetWidth = 400;
 
-  // Platform-specific icon path
-  let iconPath;
-  if (process.platform === 'win32') {
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.ico');
-  } else if (process.platform === 'linux') {
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
-  } else if (process.platform === 'darwin') {
-    // Optional for development (macOS uses .icns at packaging time)
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
-  }
-
+  // Create BrowserWindow
   win = new BrowserWindow({
     width: widgetWidth,
     height: height,
     x: width - widgetWidth,
     y: 0,
     resizable: false,
-    frame: false,
-    transparent: true,
+    frame: isLinux,            // Use frame on Linux for better compatibility
+    transparent: !isLinux,     // Transparent for Windows/macOS
     backgroundColor: '#00000000',
-    alwaysOnTop: false,
-    skipTaskbar: false,
+    alwaysOnTop: true,         // Widget stays on top
+    skipTaskbar: true,         // Hide from taskbar
     icon: iconPath,
-    fullscreenable: false, // ❗️Prevents fullscreen via F11 or green button
+    title: 'OGDP Earthquake',
+    minimizable: true,
+    closable: true,
+    fullscreenable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
   });
-  
-  // Prevent forced programmatic fullscreen (safety net)
-  win.on('enter-full-screen', () => {
-    win.setFullScreen(false);
-  });
 
+  // Prevent forced fullscreen
+  win.on('enter-full-screen', () => win.setFullScreen(false));
+
+  // Hide menu bar
   win.setMenuBarVisibility(false);
 
-  win.loadFile('index.html').catch(err => {
-    console.error('Failed to load index.html:', err);
-  });
+  // Load main HTML
+  win.loadFile('index.html').catch(err => console.error('Failed to load index.html:', err));
 
-  // Clean up reference on close
-  win.on('closed', () => {
-    win = null;
-  });
+  // Cleanup
+  win.on('closed', () => win = null);
 }
 
 // Handle renderer close request
 ipcMain.on('close-window', () => {
-  if (win) win.close();
+  if (win) {
+    win.destroy();
+    win = null;
+  }
 });
 
-// App ready
+// Optional: Create a tray icon for quick access
 app.whenReady().then(() => {
   createWindow();
+
+  tray = new Tray(iconPath);
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show Widget', click: () => { if (!win) createWindow(); else win.show(); } },
+    { label: 'Exit', click: () => { app.quit(); } }
+  ]);
+  tray.setToolTip('OGDP Earthquake Widget');
+  tray.setContextMenu(contextMenu);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// Quit unless on macOS
+// Quit app except on macOS
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (platform !== 'darwin') app.quit();
 });
+
+// Global error handling
+process.on('uncaughtException', (err) => console.error('Uncaught Exception:', err));
+process.on('unhandledRejection', (reason) => console.error('Unhandled Promise Rejection:', reason));
