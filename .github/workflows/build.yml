@@ -8,8 +8,8 @@ on:
 env:
   CI: true
   NODE_OPTIONS: --max_old_space_size=4096
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Add this line to make token available
-
+  GH_TOKEN: ${{ github.token }}
+  
 jobs:
   build:
     runs-on: ${{ matrix.os }}
