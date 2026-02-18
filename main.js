@@ -1,29 +1,26 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const path = require('path');
 
-// Detect platform
-const platform = process.platform;
-const isLinux = platform === 'linux';
-
-// Global reference
 let win;
-let tray;
 
-// Optional: Fix graphics-related crashes on Linux/VMs
+// Optional: Fix graphics-related crashes (especially on Linux/VMs)
 app.commandLine.appendSwitch('disable-gpu');
-
-// Platform-specific icon paths
-const icons = {
-  win32: path.join(__dirname, 'build', 'icons', 'icon.ico'),
-  linux: path.join(__dirname, 'build', 'icons', 'icon.png'),
-  darwin: path.join(__dirname, 'build', 'icons', 'icon.png')
-};
-const iconPath = icons[platform] || icons.linux;
 
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
   const widgetWidth = 400;
+
+  // Platform-specific icon path
+  let iconPath;
+  if (process.platform === 'win32') {
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.ico');
+  } else if (process.platform === 'linux') {
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
+  } else if (process.platform === 'darwin') {
+    // Optional for development (macOS uses .icns at packaging time)
+    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
+  }
 
   win = new BrowserWindow({
     width: widgetWidth,
@@ -31,80 +28,54 @@ function createWindow() {
     x: width - widgetWidth,
     y: 0,
     resizable: false,
-    frame: isLinux,          // Keep frame for Linux taskbar
-    transparent: !isLinux,   
+    frame: false,
+    transparent: true,
     backgroundColor: '#00000000',
-    alwaysOnTop: true,
-    skipTaskbar: false,      // Show in taskbar
-    icon: iconPath,          // Taskbar icon
-    title: 'OGDP',           // Match StartupWMClass
-    minimizable: true,
-    closable: true,
-    fullscreenable: false,
+    alwaysOnTop: false,
+    skipTaskbar: false,
+    icon: iconPath,
+    fullscreenable: false, // ❗️Prevents fullscreen via F11 or green button
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
   });
+  
+  // Prevent forced programmatic fullscreen (safety net)
+  win.on('enter-full-screen', () => {
+    win.setFullScreen(false);
+  });
 
-  // Prevent forced fullscreen
-  win.on('enter-full-screen', () => win.setFullScreen(false));
-
-  // Hide menu bar
   win.setMenuBarVisibility(false);
 
-  // Load main HTML
-  win.loadFile('index.html').catch(err => console.error('Failed to load index.html:', err));
+  win.loadFile('index.html').catch(err => {
+    console.error('Failed to load index.html:', err);
+  });
 
-  // Cleanup
-  win.on('closed', () => win = null);
+  // Clean up reference on close
+  win.on('closed', () => {
+    win = null;
+  });
 }
 
 // Handle renderer close request
 ipcMain.on('close-window', () => {
-  if (win) {
-    win.destroy();
-    win = null;
-  }
+  if (win) win.close();
 });
 
-// Optional: Create a tray icon for quick access
+// App ready
 app.whenReady().then(() => {
   createWindow();
-
-  tray = new Tray(iconPath);
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show Widget', click: () => win.show() },
-    { label: 'Exit', click: () => { app.isQuitting = true; app.quit(); } }
-  ]);
-  tray.setToolTip('OGDP Earthquake Widget');
-  tray.setContextMenu(contextMenu);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-  // Hide window instead of quitting
-  win.on('close', (e) => {
-    if (!app.isQuitting) {
-      e.preventDefault();
-      win.hide();
-    }
-  });
-
-  // Optional: minimize to tray
-  win.on('minimize', (e) => {
-    e.preventDefault();
-    win.hide();
-  });
 });
 
-// Quit app except on macOS
+// Quit unless on macOS
 app.on('window-all-closed', () => {
-  if (platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
-
-// Global error handling
-process.on('uncaughtException', (err) => console.error('Uncaught Exception:', err));
-process.on('unhandledRejection', (reason) => console.error('Unhandled Promise Rejection:', reason));
