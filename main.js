@@ -3,28 +3,24 @@ const path = require('path');
 
 let win;
 
-// Optional: Fix graphics-related crashes (especially on Linux/VMs)
-app.commandLine.appendSwitch('disable-gpu');
+// ⚠️ Only disable GPU if needed (Linux issues)
+// app.commandLine.appendSwitch('disable-gpu');
 
 function createWindow() {
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width, height } = primaryDisplay.workAreaSize;
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const widgetWidth = 400;
 
-  // Platform-specific icon path
-  let iconPath;
-  if (process.platform === 'win32') {
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.ico');
-  } else if (process.platform === 'linux') {
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
-  } else if (process.platform === 'darwin') {
-    // Optional for development (macOS uses .icns at packaging time)
-    iconPath = path.join(__dirname, 'build', 'icons', 'icon.png');
-  }
+  const iconMap = {
+    win32: 'icon.ico',
+    linux: 'icon.png',
+    darwin: 'icon.png'
+  };
+
+  const iconPath = path.join(__dirname, 'build', 'icons', iconMap[process.platform]);
 
   win = new BrowserWindow({
     width: widgetWidth,
-    height: height,
+    height,
     x: width - widgetWidth,
     y: 0,
     resizable: false,
@@ -34,48 +30,58 @@ function createWindow() {
     alwaysOnTop: false,
     skipTaskbar: false,
     icon: iconPath,
-    fullscreenable: false, // ❗️Prevents fullscreen via F11 or green button
+    fullscreenable: false,
+
+    // 🔥 Performance-critical
+    show: false,
+
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      sandbox: true
     }
   });
-  
-  // Prevent forced programmatic fullscreen (safety net)
+
+  // Prevent fullscreen
   win.on('enter-full-screen', () => {
     win.setFullScreen(false);
   });
 
   win.setMenuBarVisibility(false);
 
-  win.loadFile('index.html').catch(err => {
-    console.error('Failed to load index.html:', err);
+  // 🔥 Load first
+  win.loadFile('index.html');
+
+  // 🔥 Show only when ready (removes blank delay)
+  win.once('ready-to-show', () => {
+    win.show();
   });
 
-  // Clean up reference on close
   win.on('closed', () => {
     win = null;
   });
 }
 
-// Handle renderer close request
+// IPC
 ipcMain.on('close-window', () => {
   if (win) win.close();
 });
 
-// App ready
+// 🚀 Startup optimization
 app.whenReady().then(() => {
   createWindow();
+
+  // 🔥 Defer non-critical work
+  setTimeout(() => {
+    // future heavy tasks go here
+  }, 100);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// Quit unless on macOS
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
