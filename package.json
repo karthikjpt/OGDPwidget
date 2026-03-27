@@ -11,25 +11,30 @@
   "build": {
     "appId": "in.ogdp.todayeq",
     "productName": "OGDP",
-    "copyright": "Copyright © 2025 OGDP",
-    "compression": "maximum",
+    "compression": "normal",
     "asar": true,
+  
     "files": [
       "main.js",
       "preload.js",
       "index.html",
       "build/**/*",
-      "dist/**/*",
+  
       "!**/*.log",
       "!**/*.md",
       "!**/.git*",
+      "!**/*.map",
+      "!**/test/**",
+      "!**/__tests__/**",
       "!node_modules/.cache/**",
       "!node_modules/electron-builder/**"
     ],
+  
     "directories": {
       "output": "dist",
       "buildResources": "build"
     },
+  
     "nsis": {
       "oneClick": false,
       "perMachine": true,
@@ -37,31 +42,32 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "OGDP Earthquake",
-      "differentialPackage": true
+      "differentialPackage": false
     },
+  
     "linux": {
-      "target": ["AppImage", "deb"],
-      "maintainer": "Karthik <karthikmi@hotmail.com>",
+      "target": ["AppImage"],
       "category": "Utility",
       "icon": "build/icons/icon.png"
     },
+  
     "win": {
       "target": [
         { "target": "nsis", "arch": ["x64"] },
         { "target": "portable", "arch": ["x64"] }
       ],
       "icon": "build/icons/icon.ico",
-      "publisherName": "Karthik",
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "publisherName": "Karthik"
     },
+  
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": ["dmg"],
       "category": "public.app-category.utilities",
       "icon": "build/icons/icon.icns"
     },
+  
     "publish": null
-  },
-
+  }
   "devDependencies": {
     "electron": "^29.0.0",
     "electron-builder": "^24.0.0"
