@@ -50,13 +50,13 @@ jobs:
 
       - name: Install Dependencies (faster)
         run: npm ci --prefer-offline
-
+        
       - name: Build Electron App
-        run: npm run build
+        run: npm run build -- --publish=never
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
           CSC_IDENTITY_AUTO_DISCOVERY: false
-
+          
       - name: Prepare Linux Desktop Entry
         if: matrix.os == 'ubuntu-latest'
         run: |
