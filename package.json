@@ -8,42 +8,33 @@
   },
   "homepage": "https://www.ogdp.in",
   "main": "main.js",
-
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "postinstall": "electron-builder install-app-deps || exit 0"
   },
-
   "build": {
     "appId": "in.ogdp.todayeq",
     "productName": "OGDP",
     "copyright": "Copyright © 2025 OGDP",
-
-    // 🔥 Performance + size optimization
     "compression": "maximum",
     "asar": true,
-
-    // 🔥 Controlled file inclusion (VERY IMPORTANT)
     "files": [
       "main.js",
       "preload.js",
       "index.html",
       "build/**/*",
       "dist/**/*",
-
       "!**/*.log",
       "!**/*.md",
       "!**/.git*",
       "!node_modules/.cache/**",
       "!node_modules/electron-builder/**"
     ],
-
     "directories": {
       "output": "dist",
       "buildResources": "build"
     },
-
     "nsis": {
       "oneClick": false,
       "perMachine": true,
@@ -51,18 +42,14 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "OGDP Earthquake",
-
-      // 🔥 Smaller updates
       "differentialPackage": true
     },
-
     "linux": {
       "target": ["AppImage", "deb"],
       "maintainer": "Karthik <karthikmi@hotmail.com>",
       "category": "Utility",
       "icon": "build/icons/icon.png"
     },
-
     "win": {
       "target": [
         {
@@ -78,20 +65,16 @@
       "publisherName": "Karthik",
       "artifactName": "${productName}-Setup-${version}.${ext}"
     },
-
     "mac": {
       "target": ["dmg", "zip"],
       "category": "public.app-category.utilities",
       "icon": "build/icons/icon.icns"
     },
-
     "publish": {
       "provider": "github"
     }
   },
-
   "dependencies": {},
-
   "devDependencies": {
     "electron": "29.4.6",
     "electron-builder": "^24.13.3",
