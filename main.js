@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, shell } = require('electron');
 const path = require('path');
 
 let win;
@@ -45,14 +45,21 @@ function createWindow() {
 
   win.loadFile('index.html');
 
-  // ✅ Security: block navigation
-  win.webContents.on('will-navigate', (event) => {
-    event.preventDefault();
+  // ✅ Allow only OGDP links externally
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://www.ogdp.in')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
   });
 
-  // ✅ Security: block new windows
-  win.webContents.setWindowOpenHandler(() => {
-    return { action: 'deny' };
+  win.webContents.on('will-navigate', (event, url) => {
+    if (url.startsWith('https://www.ogdp.in')) {
+      event.preventDefault();
+      shell.openExternal(url);
+    } else {
+      event.preventDefault();
+    }
   });
 
   win.once('ready-to-show', () => {
