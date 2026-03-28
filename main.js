@@ -3,6 +3,24 @@ const path = require('path');
 
 let win;
 
+ipcMain.on('open-external', (event, url) => {
+  try {
+    const parsed = new URL(url);
+
+    // ✅ strict allowlist
+    if (
+      parsed.hostname.endsWith('ogdp.in') ||
+      parsed.hostname.endsWith('emsc-csem.org')
+    ) {
+      shell.openExternal(url);
+    } else {
+      console.warn('Blocked external:', url);
+    }
+  } catch {
+    console.warn('Invalid URL:', url);
+  }
+});
+
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const widgetWidth = 400;
@@ -44,22 +62,31 @@ function createWindow() {
   win.setMenuBarVisibility(false);
 
   win.loadFile('index.html');
-
-  // ✅ Allow only OGDP links externally
+  
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https://www.ogdp.in')) {
-      shell.openExternal(url);
-    }
+    try {
+      const parsed = new URL(url);
+  
+      if (parsed.hostname.endsWith('ogdp.in')) {
+        shell.openExternal(url);
+      }
+  
+    } catch {}
+  
     return { action: 'deny' };
   });
-
+  
   win.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith('https://www.ogdp.in')) {
-      event.preventDefault();
-      shell.openExternal(url);
-    } else {
-      event.preventDefault();
-    }
+    event.preventDefault();
+  
+    try {
+      const parsed = new URL(url);
+  
+      if (parsed.hostname.endsWith('ogdp.in')) {
+        shell.openExternal(url);
+      }
+  
+    } catch {}
   });
 
   win.once('ready-to-show', () => {
