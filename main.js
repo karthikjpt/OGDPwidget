@@ -3,9 +3,6 @@ const path = require('path');
 
 let win;
 
-// ⚠️ Only disable GPU if needed (Linux issues)
-// app.commandLine.appendSwitch('disable-gpu');
-
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const widgetWidth = 400;
@@ -31,10 +28,7 @@ function createWindow() {
     skipTaskbar: false,
     icon: iconPath,
     fullscreenable: false,
-
-    // 🔥 Performance-critical
     show: false,
-
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -43,17 +37,24 @@ function createWindow() {
     }
   });
 
-  // Prevent fullscreen
   win.on('enter-full-screen', () => {
     win.setFullScreen(false);
   });
 
   win.setMenuBarVisibility(false);
 
-  // 🔥 Load first
   win.loadFile('index.html');
 
-  // 🔥 Show only when ready (removes blank delay)
+  // ✅ Security: block navigation
+  win.webContents.on('will-navigate', (event) => {
+    event.preventDefault();
+  });
+
+  // ✅ Security: block new windows
+  win.webContents.setWindowOpenHandler(() => {
+    return { action: 'deny' };
+  });
+
   win.once('ready-to-show', () => {
     win.show();
   });
@@ -63,19 +64,14 @@ function createWindow() {
   });
 }
 
-// IPC
 ipcMain.on('close-window', () => {
   if (win) win.close();
 });
 
-// 🚀 Startup optimization
 app.whenReady().then(() => {
   createWindow();
 
-  // 🔥 Defer non-critical work
-  setTimeout(() => {
-    // future heavy tasks go here
-  }, 100);
+  setTimeout(() => {}, 100);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
