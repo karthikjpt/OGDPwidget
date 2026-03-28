@@ -1,7 +1,7 @@
-const { contextBridge, ipcRenderer, shell } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('OGDP', {
-  openExternal: (url) => shell.openExternal(url), // ✅ NEW
+  openExternal: (url) => ipcRenderer.send('open-external', url),
 
   window: {
     close: () => ipcRenderer.send('close-window')
